@@ -1,0 +1,8 @@
+---
+- include_vars: "setup-details.yml"
+- import_tasks: setup.yml
+- import_tasks: iptables.yml
+  when: IPTABLES == 'YES'
+- import_tasks: iptables_status.yml
+  when: IPTABLESAUDIT == 'YES'
+
