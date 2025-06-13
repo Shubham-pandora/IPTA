@@ -6,23 +6,14 @@
   set_fact:
     server_ip: "{{ ip_output.stdout.split()[0] }}"
 
-- name: Check file
-  stat:
-    path: "{{ iptables_config }}"
-  register: file_data
-
-- name: copy file
-  shell: cp /home/veerender/Documents/POC/test.txt /home/veerender/Documents/POC/audittest.txt
-  when: not file_data.stat.exists
-
 - name: Run diff for left side (lines in iptables not in auditiptables)
-  shell: diff --old-line-format='%L' --new-line-format='' --unchanged-line-format='' {{ iptables_config }}  {{ iptables_audit }}
+  shell: diff --old-line-format='%L' --new-line-format='' --unchanged-line-format='' {{ iptables_config }} {{ iptables_audit }}
   register: left_diff
   failed_when: left_diff.rc not in [0, 1]
   ignore_errors: true
 
 - name: Run diff for right side (lines in auditiptables not in iptables)
-  shell: diff --old-line-format='' --new-line-format='%L' --unchanged-line-format=''  {{ iptables_config }}  {{ iptables_audit }}
+  shell: diff --old-line-format='' --new-line-format='%L' --unchanged-line-format='' {{ iptables_config }} {{ iptables_audit }}
   register: right_diff
   failed_when: right_diff.rc not in [0, 1]
   ignore_errors: true
@@ -35,14 +26,13 @@
 
 - name: Create CSV file with header if it doesn't exist
   shell: |
-    FILE="$(pwd)/iptables_diff.csv"
-    [ -f "$FILE" ] || echo '"Server IP","Original","Audit"' > "$FILE"
+    [ -f /opt/nodejs/IPTA/iptables_diff.csv ] || echo '"Server IP","Original","Audit"' > /opt/nodejs/IPTA/iptables_diff.csv
   delegate_to: localhost
   run_once: true
 
 - name: Append CSV row to file
   lineinfile:
-    path: /home/veerender/Documents/POC/iptables_diff.csv
+    path: /opt/nodejs/IPTA/iptables_diff.csv
     line: "{{ csv_line }}"
     create: yes
     insertafter: EOF
