@@ -3,6 +3,6 @@ iptables_pkgs:
   - iptables-utils
 iptables_service: iptables
 iptables_config: '/etc/sysconfig/iptables'
-iptables_config: '/etc/sysconfig/iptables_audit'
-iptables_config: '/etc/sysconfig/iptables_backup'
+iptables_audit: '/etc/sysconfig/iptables_audit'
+iptables_backup: '/etc/sysconfig/iptables_backup'
 iptables_show_rules: true
