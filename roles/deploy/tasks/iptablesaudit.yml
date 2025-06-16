@@ -33,16 +33,36 @@
       "{{ server_ip }}","{{ left_diff.stdout | replace('\"', '\"\"') | replace('\n', '\\n') }}","{{ right_diff.stdout | replace('\"', '\"\"') | replace('\n', '\\n') }}"
   delegate_to: localhost
 
+- name: Set current working directory as variable
+  set_fact:
+    current_dir: "{{ lookup('pipe', 'pwd') }}"
+  delegate_to: localhost
+  run_once: true
+
 - name: Create CSV file with header if it doesn't exist
   shell: |
-    [ -f /opt/nodejs/IPTA/iptables_diff.csv ] || echo '"Server IP","Original","Audit"' > /opt/nodejs/IPTA/iptables_diff.csv
+    [ -f "{{ current_dir }}/iptables_diff.csv" ] || echo '"Server IP","Original","Audit"' > "{{ current_dir }}/iptables_diff.csv"
   delegate_to: localhost
   run_once: true
 
 - name: Append CSV row to file
   lineinfile:
-    path: /opt/nodejs/IPTA/iptables_diff.csv
+    path: "{{ current_dir }}/iptables_diff.csv"
     line: "{{ csv_line }}"
     create: yes
     insertafter: EOF
   delegate_to: localhost
+
+# - name: Create CSV file with header if it doesn't exist
+#   shell: |
+#     [ -f /opt/nodejs/IPTA/iptables_diff.csv ] || echo '"Server IP","Original","Audit"' > /opt/nodejs/IPTA/iptables_diff.csv
+#   delegate_to: localhost
+#   run_once: true
+
+# - name: Append CSV row to file
+#   lineinfile:
+#     path: /opt/nodejs/IPTA/iptables_diff.csv
+#     line: "{{ csv_line }}"
+#     create: yes
+#     insertafter: EOF
+#   delegate_to: localhost
