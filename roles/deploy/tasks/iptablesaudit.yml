@@ -1,6 +1,6 @@
 - name: Configure template for Audit
   template:
-    src: test.j2
+    src: iptables.j2
     dest: "{{ iptables_audit }}"
     owner: root
     group: root
