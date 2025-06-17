@@ -24,7 +24,7 @@
     mode: 0640
     backup: yes
   diff: true
-  delegate_to: 192.168.0.107
+  delegate_to: 192.168.0.108
 
 
 # - name: Configure host template
