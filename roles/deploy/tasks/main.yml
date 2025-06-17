@@ -6,5 +6,7 @@
   when: IPTABLES == 'YES'
 - import_tasks: iptablesaudit.yml
   when: IPTABLESAUDIT == 'YES'
+- import_tasks: nagios.yml
+  when: NAGIOS == 'YES'
 
 
