@@ -5,14 +5,14 @@
     update_cache: yes
 
 # Run check_nrpe on 52 but delegate from 96
-- name: Run check_nrpe on 52 from 96
+- name: Run check_nrpe on nagios-server
   shell: /usr/lib64/nagios/plugins/check_nrpe -H {{ inventory_hostname }}
   register: nrpe_status
   delegate_to: 10.30.48.52
   failed_when: false
   changed_when: false
 
-- name: Set NRPE status fact for use in this host (96)
+- name: Set NRPE status fact for use in this host 
   set_fact:
     nrpe_stdout: "{{ nrpe_status.stdout }}"
   when: nrpe_status.stdout is defined
