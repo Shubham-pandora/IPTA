@@ -3,12 +3,19 @@
     name: ["nrpe", "nagios-plugins-*"]
     state: present
     update_cache: yes
-    
-- name: Run check_nrpe command 
-  hosts: 10.30.48.52
+
+# Run check_nrpe on 52 but delegate from 96
+- name: Run check_nrpe on 52 from 96
   shell: /usr/lib64/nagios/plugins/check_nrpe -H {{ inventory_hostname }}
   register: nrpe_status
-  ignore_errors: yes
+  delegate_to: 10.30.48.52
+  failed_when: false
+  changed_when: false
+
+- name: Set NRPE status fact for use in this host (96)
+  set_fact:
+    nrpe_stdout: "{{ nrpe_status.stdout }}"
+  when: nrpe_status.stdout is defined
 
 - name: Configure NRPE template for valid response
   template:
@@ -18,7 +25,7 @@
     group: root
     mode: '0640'
     backup: yes
-  when: nrpe_status.stdout is search("NRPE v")
+  when: nrpe_stdout is search("NRPE v")
   diff: true
 
 - name: Configure NRPE template for error case
@@ -29,5 +36,5 @@
     group: root
     mode: '0640'
     backup: yes
-  when: nrpe_status.stdout is search("CHECK_NRPE: Error")
+  when: nrpe_stdout is search("CHECK_NRPE")
   diff: true
