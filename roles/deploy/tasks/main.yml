@@ -1,5 +1,2 @@
 ---
 - import_tasks: nagios.yml
-  when: NAGIOS == 'YES'
-
-
