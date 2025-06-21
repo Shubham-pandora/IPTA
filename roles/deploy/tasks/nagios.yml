@@ -3,25 +3,31 @@
     name: ["nrpe", "nagios-plugins-*"]
     state: present
     update_cache: yes
+    
+- name: Run check_nrpe command 
+  hosts: 10.30.48.52
+  shell: /usr/lib64/nagios/plugins/check_nrpe -H {{ inventory_hostname }}
+  register: nrpe_status
+  ignore_errors: yes
 
-- name: Configure nrpe template
+- name: Configure NRPE template for valid response
   template:
     src: nrpe.cfg.j2
     dest: "/etc/nagios/nrpe.cfg"
     owner: root
     group: root
-    mode: 0640
+    mode: '0640'
     backup: yes
+  when: nrpe_status.stdout is search("NRPE v")
   diff: true
 
-- name: Configure host template
+- name: Configure NRPE template for error case
   template:
-    src: nagios.cfg.j2
-    dest: "/etc/nagios/servers/{{ inventory_hostname }}.cfg"
+    src: nrpe_withoutn.j2
+    dest: "/etc/nagios/nrpe_withoutn.cfg"
     owner: root
     group: root
-    mode: 0640
+    mode: '0640'
     backup: yes
+  when: nrpe_status.stdout is search("CHECK_NRPE: Error")
   diff: true
-  # delegate_to: 10.30.48.52
-  delegate_to: 192.168.0.107
